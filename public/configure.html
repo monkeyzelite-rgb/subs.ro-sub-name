@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="ro">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Configurare Subs.ro Stremio</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        /* Subs.ro Dark Theme Palette */
+        --bg-body-from: #1a1a1a;
+        --bg-body-to: #0f0f0f;
+        --bg-header: #1f1f1f;
+        --bg-nav: #2a2a2a;
+        --bg-hover: #333333;
+        --bg-white: #252525;
+        --border-primary: #3a3a3a;
+        --border-secondary: #404040;
+        --text-primary: #e5e5e5;
+        --text-secondary: #d1d5db;
+        --text-tertiary: #9ca3af;
+        --text-muted: #6b7280;
+        --pagination-disabled: #333333;
+        
+        --brand-primary: #dc2626; /* Using the specific red from the request */
+        --brand-hover: #b91c1c;
+
+        --pill: inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+        --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      }
+
+      body {
+        background: linear-gradient(to bottom, var(--bg-body-from), var(--bg-body-to));
+        color: var(--text-primary);
+        font-family: "Montserrat", sans-serif;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        transition: background-color 0.2s ease, color 0.2s ease;
+      }
+
+      /* Logo Container */
+      .logo-container {
+        text-align: center; 
+        margin-bottom: 2rem;
+        filter: drop-shadow(0 0 10px rgba(220, 38, 38, 0.2));
+      }
+
+      .container {
+        width: 100%;
+        max-width: 480px;
+        background: var(--bg-header); /* Matching card/header background */
+        border: 1px solid var(--border-primary);
+        border-radius: 8px;
+        padding: 2.5rem;
+        box-shadow: var(--glass-shadow);
+        animation: fadeIn 0.4s ease-out;
+        position: relative;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .header h1 {
+        color: var(--text-primary);
+        margin: 0;
+        font-size: 1.5rem; /* Slightly smaller to match screenshot vibes */
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      .header p {
+        color: var(--text-tertiary);
+        margin-top: 0.5rem;
+        font-size: 0.95rem;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+      }
+
+      .form-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+      }
+      
+      .form-header label {
+        margin-bottom: 0;
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.9rem;
+      }
+
+      .api-help-link {
+        font-size: 0.8rem;
+        color: var(--text-tertiary);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .api-help-link:hover {
+        color: var(--brand-primary);
+        text-decoration: underline;
+      }
+
+      .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      input[type="text"], input[type="password"] {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        padding-right: 110px; /* Space for buttons */
+        background-color: var(--bg-nav);
+        border: 1px solid var(--border-secondary);
+        border-radius: 6px;
+        color: var(--text-primary);
+        box-sizing: border-box;
+        transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        font-family: monospace;
+        font-size: 1rem;
+      }
+
+      /* Hide browser's native password reveal button */
+      input[type="password"]::-ms-reveal,
+      input[type="password"]::-ms-clear,
+      input[type="password"]::-webkit-credentials-auto-fill-button,
+      input[type="password"]::-webkit-textfield-decoration-container {
+        display: none !important;
+      }
+
+      input:focus {
+        outline: none;
+        border-color: var(--brand-primary);
+        background-color: var(--bg-white);
+      }
+
+      .input-actions {
+        position: absolute;
+        right: 6px;
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        height: 100%;
+      }
+
+      .action-btn {
+        background: var(--bg-hover);
+        border: 1px solid var(--border-primary);
+        color: var(--text-secondary);
+        padding: 6px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 32px;
+        min-width: 32px;
+      }
+      .action-btn:hover {
+        background: var(--border-secondary);
+        color: var(--text-primary);
+      }
+
+      /* Toggle Visibility Button (Hidden by default) */
+      #toggleBtn {
+        display: none; 
+        padding: 0 8px;
+        background: transparent;
+        border: none;
+      }
+      #toggleBtn svg {
+        width: 20px;
+        height: 20px;
+        stroke: var(--text-tertiary);
+        transition: stroke 0.2s;
+      }
+
+      .validate-btn {
+        background: var(--brand-primary);
+        border-color: var(--brand-primary);
+        color: #fff;
+      }
+      .validate-btn:hover {
+        background: var(--brand-hover);
+        border-color: var(--brand-hover);
+      }
+      
+      .validate-btn.state-valid {
+        background-color: #22c55e !important;
+        border-color: #22c55e !important;
+        color: #fff;
+      }
+      
+      .validate-btn.state-invalid {
+        background-color: #ef4444 !important;
+        border-color: #ef4444 !important;
+        color: #fff;
+        animation: shake 0.4s ease-in-out;
+      }
+
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-4px); }
+        75% { transform: translateX(4px); }
+      }
+
+      .language-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+        gap: 8px;
+        margin-top: 1rem;
+      }
+
+      .lang-checkbox {
+        display: none;
+      }
+
+      .lang-label {
+        background: var(--bg-nav);
+        padding: 8px 5px;
+        border-radius: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: var(--pill);
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        user-select: none;
+      }
+
+      .lang-label:hover {
+        border-color: var(--text-muted);
+        color: var(--text-primary);
+      }
+
+      .lang-checkbox:checked + .lang-label {
+        background: var(--brand-primary);
+        border-color: var(--brand-primary);
+        color: white;
+      }
+
+      .lang-checkbox:checked + .lang-label:hover {
+        background: var(--brand-hover);
+      }
+
+      .btn {
+        display: block;
+        width: 100%;
+        padding: 0.8rem 1rem;
+        background: var(--brand-primary);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        margin-top: 2.5rem;
+        text-decoration: none;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        user-select: none;
+      }
+
+      .btn:hover:not(:disabled) {
+        background: var(--brand-hover);
+      }
+
+      .btn:disabled {
+        background: var(--pagination-disabled);
+        color: var(--text-muted);
+        cursor: not-allowed;
+      }
+
+      .toggle-lang {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: transparent;
+        border: 1px solid var(--border-primary);
+        color: var(--text-tertiary);
+        padding: 10px 10px;
+        border-radius: 100%;
+        cursor: pointer;
+        font-size: 0.8rem;
+        transition: all 0.2s;
+        font-weight: 800;
+      }
+
+      .toggle-lang:hover {
+        color: var(--text-primary);
+        border-color: var(--text-muted);
+      }
+
+      .footer {
+        text-align: center;
+        font-size: 0.95rem; 
+        color: var(--text-muted);
+        line-height: 1.6;
+      }
+
+      .footer a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s;
+      }
+      .footer a:hover {
+        color: var(--brand-primary);
+      }
+
+      /* Manual Link Fallback Box */
+      #installLinkDisplay {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        background: var(--bg-nav);
+        border: 1px solid var(--border-secondary);
+        border-radius: 6px;
+      }
+
+      button#copyLinkBtn:hover {
+        background: var(--brand-hover) !important;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      /* Shiny Text Animation */
+      .shiny-text {
+        background: linear-gradient(
+          to right,
+          var(--text-primary) 20%,
+          #fff 50%,
+          var(--text-primary) 80%
+        );
+        background-size: 200% auto;
+        color: var(--text-primary);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shine 5s linear infinite;
+      }
+
+      @keyframes shine {
+        to {
+          background-position: 200% center;
+        }
+      }
+
+      /* Support Section */
+      .support-section {
+        margin-top: 0.75rem;
+        padding-top: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+      
+      .support-msg {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+      }
+
+      /* Rainbow Button */
+      .donate-btn {
+        position: relative;
+        text-decoration: none;
+        padding: 10px 24px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: white;
+        background: #111;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        overflow: hidden;
+        transition: transform 0.2s;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      }
+      
+      .donate-btn::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        border-radius: 50px; 
+        padding: 2px; /* Border width */
+        background: linear-gradient(
+          90deg, 
+          #FF0000, #FF7F00, #FFFF00, #00FF00, #0000FF, #4B0082, #8B00FF, #FF0000
+        );
+        background-size: 400% 100%;
+        filter: saturate(0.75);
+
+        animation: rainbow 24s linear infinite;
+        mask: 
+          linear-gradient(#fff 0 0) content-box, 
+          linear-gradient(#fff 0 0);
+        -webkit-mask: 
+          linear-gradient(#fff 0 0) content-box, 
+          linear-gradient(#fff 0 0);
+        mask-composite: exclude;
+        -webkit-mask-composite: xor;
+        pointer-events: none;
+      }
+      
+      .donate-btn:hover {
+        transform: translateY(-2px);
+      }
+      
+      .donate-btn svg {
+         fill: #ff5e5b;
+      }
+
+      @keyframes rainbow {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 400% 50%; }
+      }
+
+
+      .shiny-reflect {
+        position: relative;
+        display: inline-block;
+        overflow: hidden;
+      }
+
+      .shiny-reflect::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(255,255,255,0.7) 50%,
+          transparent 100%
+        );
+
+        width: var(--shiny-width, 120px);
+        transform: translateX(-100%);
+        animation: shiny-reflect-move 1.2s cubic-bezier(.6,.6,0,1) forwards;
+        mix-blend-mode: overlay;
+        pointer-events: none;
+      }
+
+      @keyframes shiny-reflect-move {
+        to {
+          transform: translateX(250%);
+        }
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="logo-container">
+        <!-- Using the flat logo provided by user -->
+        <img src="https://cdn.subs.ro/img/logo-flat.png?vg-251225-0NrlR" alt="Subs.ro Logo" style="max-width: 220px; height: auto;">
+    </div>
+
+    <div class="container">
+      <button class="toggle-lang" onclick="toggleLanguage()">
+         RO | EN
+      </button>
+
+      <div class="header">
+        <h1 data-i18n="title">Configurare Subs.ro</h1>
+        <p data-i18n="subtitle" class="shiny-reflect">Subtitrări românești pentru Stremio</p>
+      </div>
+
+      <div class="form-group">
+        <div class="form-header">
+            <label for="apiKey" data-i18n="apiKeyLabel">Cheie API Subs.ro</label>
+            <a href="https://subs.ro/api" target="_blank" class="api-help-link" data-i18n="apiKeyGet">Obține cheie gratuită →</a>
+        </div>
+        <div class="input-wrapper">
+          <input
+            type="password"
+            id="apiKey"
+            placeholder="Introduceți cheia API..."
+            required
+            autofocus
+            oninput="handleInput()"
+            onkeydown="if(event.key === 'Enter') validateKey()"
+          />
+          <div class="input-actions">
+            <button class="action-btn" onclick="toggleVisibility()" id="toggleBtn" title="Show/Hide">
+                <!-- Eye Icon (Open) -->
+                <svg id="icon-eye" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                <!-- Eye Icon (Closed) Hidden by default -->
+                <svg id="icon-eye-off" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+            </button>
+            <button class="action-btn validate-btn" onclick="validateKey()" id="validateBtn" data-i18n="validateBtn">Verifică</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label data-i18n="languagesLabel">Limbi Dorite</label>
+        <div class="language-grid" id="langGrid"></div>
+      </div>
+
+      <button id="installBtn" class="btn" onclick="installAddon()" disabled data-i18n="installBtn">
+        INSTALEAZĂ
+      </button>
+
+      <!-- Support Section -->
+      <div class="support-section">
+        <div class="support-msg" data-i18n="supportMsg">Îți place addon-ul? Susține proiectul.</div>
+        <a href="https://revolut.me/altcelalalt" target="_blank" class="donate-btn">
+             <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="Revolut--Streamline-Simple-Icons" style="height: 18px; width: 18px; fill: white;">
+               <title>Revolut</title>
+               <path d="M20.9133 6.9566C20.9133 3.1208 17.7898 0 13.9503 0H2.424v3.8605h10.9782c1.7376 0 3.177 1.3651 3.2087 3.043 0.016 0.84 -0.2994 1.633 -0.8878 2.2324 -0.5886 0.5998 -1.375 0.9303 -2.2144 0.9303H9.2322a0.2756 0.2756 0 0 0 -0.2755 0.2752v3.431c0 0.0585 0.018 0.1142 0.052 0.1612L16.2646 24h5.3114l-7.2727 -10.094c3.6625 -0.1838 6.61 -3.2612 6.61 -6.9494zM6.8943 5.9229H2.424V24h4.4704z" stroke-width="1"></path>
+             </svg>
+             <span>Revolut Pay</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>
+        <span data-i18n="footer">Dezvoltat de</span> <a href="https://github.com/allecsc" target="_blank">allecsc</a> • <span data-i18n="powered">Oferit de</span> <a href="https://subs.ro" target="_blank">subs.ro</a>
+      </p>
+    </div>
+
+
+    <script>
+      const translations = {
+        ro: {
+          title: "Configurare Subs.ro",
+          subtitle: "Subtitrări românești pentru Stremio",
+          apiKeyLabel: "Cheie API Subs.ro",
+          apiKeyGet: "Obține cheie gratuită →",
+          languagesLabel: "Limbi Dorite",
+          installBtn: "Instalează în Stremio",
+          validateBtn: "Verifică",
+          btnChecking: "...",
+          btnValid: "Valid! ✓",
+          btnInvalid: "Invalid ✕",
+          supportMsg: "Îți place addon-ul? Susține proiectul.",
+          donateBtn: "Susține pe Revolut",
+          switchLang: "EN",
+          footer: "Dezvoltat de",
+          powered: "Oferit de",
+          manualLinkText: "Dacă deschiderea automată eșuează, copiați acest link în Stremio:",
+          copyBtn: "Copiază Link",
+          other: "Altele",
+          copied: "Copiat!"
+        },
+        en: {
+          title: "Subs.ro Configuration",
+          subtitle: "Romanian subtitles for Stremio",
+          apiKeyLabel: "Subs.ro API Key",
+          apiKeyGet: "Get free key →",
+          languagesLabel: "Preferred Languages",
+          installBtn: "Install in Stremio",
+          validateBtn: "Validate",
+          btnChecking: "...",
+          btnValid: "Valid! ✓",
+          btnInvalid: "Invalid ✕",
+          supportMsg: "Enjoying the addon? Support the project.",
+          donateBtn: "Support on Revolut",
+          switchLang: "RO",
+          footer: "Developed by",
+          powered: "Provided by",
+          manualLinkText: "If automatic opening fails, copy this link into Stremio:",
+          copyBtn: "Copy Link",
+          other: "Other",
+          copied: "Copied!"
+        },
+      };
+
+      const languages = [
+        { code: "ro", name: "Română" },
+        { code: "en", name: "English" },
+        { code: "ita", name: "Italiano" },
+        { code: "fra", name: "Français" },
+        { code: "ger", name: "Deutsch" },
+        { code: "ung", name: "Magyar" },
+        { code: "gre", name: "Eλληνικά" },
+        { code: "por", name: "Português" },
+        { code: "spa", name: "Español" },
+        { code: "alt", name: "Other" },
+      ];
+
+      let currentLang = "ro";
+      let isValidated = false;
+
+      function init() {
+        loadConfigFromUrl();
+        renderLanguages();
+        applyTranslations();
+      }
+
+      function loadConfigFromUrl() {
+        const path = window.location.pathname;
+        const potentialConfig = path.split('/')[1];
+        
+        if (potentialConfig && potentialConfig !== 'configure.html' && potentialConfig !== 'configure') {
+          try {
+             let base64 = potentialConfig.replace(/-/g, "+").replace(/_/g, "/");
+             while (base64.length % 4) base64 += "=";
+             const jsonStr = atob(base64);
+             const config = JSON.parse(jsonStr);
+
+             if (config.apiKey) {
+               document.getElementById('apiKey').value = config.apiKey;
+               // Trigger input event to show visibility toggle if key exists
+               handleInput();
+             }
+
+             if (config.languages && Array.isArray(config.languages)) {
+                setTimeout(() => {
+                   document.querySelectorAll('.lang-checkbox').forEach(cb => {
+                     cb.checked = config.languages.includes(cb.value);
+                   });
+                   renderLanguages(); 
+                }, 50);
+             }
+          } catch (e) {
+            console.log("No valid config found in URL");
+          }
+        }
+      }
+
+      function toggleLanguage() {
+        currentLang = currentLang === "ro" ? "en" : "ro";
+        applyTranslations();
+        renderLanguages();
+      }
+
+      function toggleVisibility() {
+        const input = document.getElementById('apiKey');
+        const eye = document.getElementById('icon-eye');
+        const eyeOff = document.getElementById('icon-eye-off');
+        
+        if (input.type === "password") {
+          input.type = "text";
+          eye.style.display = 'none';
+          eyeOff.style.display = 'block';
+        } else {
+          input.type = "password";
+          eye.style.display = 'block';
+          eyeOff.style.display = 'none';
+        }
+      }
+
+      function handleInput() {
+        isValidated = false;
+        document.getElementById('installBtn').disabled = true;
+        
+        // Reset button state
+        const btn = document.getElementById('validateBtn');
+        const t = translations[currentLang];
+        btn.innerText = t.validateBtn;
+        btn.className = "action-btn validate-btn";
+        btn.disabled = false;
+
+        const linkDisplay = document.getElementById('installLinkDisplay');
+        if (linkDisplay) linkDisplay.remove();
+        
+        // Toggle visibility button - only show if there is text
+        const input = document.getElementById('apiKey');
+        const toggleBtn = document.getElementById('toggleBtn');
+        if (input.value.length > 0) {
+            toggleBtn.style.display = 'block';
+        } else {
+            toggleBtn.style.display = 'none';
+        }
+      }
+
+      async function validateKey() {
+        const apiKey = document.getElementById('apiKey').value.trim();
+        const btn = document.getElementById('validateBtn');
+        const t = translations[currentLang];
+        
+        if (!apiKey) return;
+
+        // Loading state
+        btn.innerText = t.btnChecking;
+        btn.disabled = true; // Prevent double clicks
+        
+        try {
+          const res = await fetch(`/api/validate/${apiKey}`);
+          const data = await res.json();
+          
+          if (data.valid) {
+            btn.innerText = t.btnValid;
+            btn.className = "action-btn validate-btn state-valid";
+            btn.disabled = false;
+            
+            isValidated = true;
+            document.getElementById('installBtn').disabled = false;
+          } else {
+            btn.innerText = t.btnInvalid;
+            btn.className = "action-btn validate-btn state-invalid";
+            btn.disabled = false;
+            
+            isValidated = false;
+            document.getElementById('installBtn').disabled = true;
+            
+            // Revert to "Validate" after 2s so user can try again easily visually
+            setTimeout(() => {
+                if (!isValidated) {
+                    btn.innerText = t.validateBtn;
+                    btn.className = "action-btn validate-btn";
+                }
+            }, 2000);
+          }
+        } catch (e) {
+          btn.innerText = t.btnInvalid;
+          btn.className = "action-btn validate-btn state-invalid";
+          btn.disabled = false;
+        }
+      }
+
+      function applyTranslations() {
+        const t = translations[currentLang];
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          const key = el.getAttribute("data-i18n");
+          if (t[key]) {
+              // Special handling for button if it has a state? 
+              // Actually, simply sticking to the key is safer unless we are in a special state.
+              // Logic: Only update validateBtn if it DOES NOT have state classes.
+              if (key === 'validateBtn') {
+                  const btn = document.getElementById('validateBtn');
+                  if (!btn.classList.contains('state-valid') && !btn.classList.contains('state-invalid')) {
+                      el.innerHTML = t[key];
+                  }
+              } else {
+                  el.innerHTML = t[key];
+              }
+          }
+        });
+        document.querySelector(".toggle-lang").innerText = t.switchLang;
+        const apiKeyInput = document.getElementById("apiKey");
+        apiKeyInput.placeholder = currentLang === "ro" ? "Introduceți cheia API..." : "Enter API Key...";
+      }
+
+      function renderLanguages() {
+        const grid = document.getElementById("langGrid");
+        const selected = Array.from(document.querySelectorAll(".lang-checkbox:checked")).map(cb => cb.value);
+        
+        grid.innerHTML = "";
+        const t = translations[currentLang];
+
+        languages.forEach((lang) => {
+          const isChecked = selected.includes(lang.code) || (selected.length === 0 && lang.code === "ro");
+
+          let displayName = lang.name;
+          if (lang.code === "alt" && t.other) {
+              displayName = t.other;
+          }
+
+          const checkedAttr = isChecked ? "checked" : "";
+          const html = `
+                    <label>
+                        <input type="checkbox" class="lang-checkbox" value="${lang.code}" ${checkedAttr}>
+                        <div class="lang-label">${displayName}</div>
+                    </label>
+                `;
+          grid.innerHTML += html;
+        });
+      }
+
+      function installAddon() {
+        if (!isValidated) return;
+
+        const apiKey = document.getElementById("apiKey").value.trim();
+        const selectedLangs = Array.from(document.querySelectorAll(".lang-checkbox:checked")).map((cb) => cb.value);
+
+        const config = { apiKey: apiKey, languages: selectedLangs };
+        const configStr = btoa(JSON.stringify(config))
+            .replace(/\+/g, '-')
+            .replace(/\//g, '_')
+            .replace(/=+$/, '');
+            
+        const host = window.location.host;
+        const protocol = window.location.protocol;
+        const manifestUrl = `${protocol}//${host}/${configStr}/manifest.json`;
+        
+        const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
+        const safeHost = isLocal ? host.replace("localhost", "127.0.0.1") : host;
+        const installUrl = `stremio://${safeHost}/${configStr}/manifest.json`;
+
+        // Redirect
+        window.location.href = installUrl;
+        
+        // Show manual link as fallback
+        const t = translations[currentLang];
+        let linkDisplay = document.getElementById('installLinkDisplay');
+        if(!linkDisplay) {
+            linkDisplay = document.createElement('div');
+            linkDisplay.id = 'installLinkDisplay';
+            // Insert after the install button, inside the container
+            const installBtn = document.getElementById('installBtn');
+            installBtn.parentNode.insertBefore(linkDisplay, installBtn.nextSibling);
+        }
+        
+        linkDisplay.innerHTML = `
+            <p style="margin:0 0 8px 0; color:#aaa; font-size:0.85rem;" data-i18n="manualLinkText">${t.manualLinkText}</p>
+            <div style="display:flex; gap:8px;">
+                <input type="text" value="${manifestUrl}" style="flex:1; padding:8px; border-radius:4px; border:1px solid #444; background:#222; color:#fff; font-family:monospace;" readonly onclick="this.select()">
+                <button id="copyLinkBtn" data-i18n="copyBtn" style="padding:8px 12px; cursor:pointer; background:var(--brand-primary); border:none; border-radius:4px; color:white; font-weight:600; transition:background-color 0.2s ease;">${t.copyBtn}</button>
+            </div>
+        `;
+        
+        document.getElementById('copyLinkBtn').onclick = () => {
+             navigator.clipboard.writeText(manifestUrl);
+             document.getElementById('copyLinkBtn').setAttribute('data-i18n', 'copied');
+             applyTranslations();
+        };
+      }
+
+      init();
+    </script>
+  </body>
+</html>
