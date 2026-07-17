@@ -14,8 +14,8 @@ const manifest = {
   ],
   types: ["subtitles"],
   behaviorHints: {
-    configurable: false,
-    configurationRequired: false,
+    configurable: true,
+    configurationRequired: true,
   },
   stremioAddonsConfig: {
     issuer: "https://stremio-addons.net",
