@@ -3,6 +3,7 @@ const cors = require("cors");
 const path = require("path");
 const querystring = require("querystring");
 const dotenv = require("dotenv");
+const os = require("os"); 
 
 const helmet = require("helmet");
 const { addonInterface, subtitlesHandler } = require("./addon");
@@ -102,11 +103,9 @@ app.get("/:config?/subtitles/:type/:id/:extra?.json", async (req, res) => {
     console.log(`✅ Am gasit ${response.subtitles ? response.subtitles.length : 0} subtitrari pentru acest film.`);
     
     if (response.subtitles && response.subtitles.length > 0) {
-      // Construim pachete complet noi
       response.subtitles = response.subtitles.map((sub, index) => {
         let extractedName = "";
         
-        // Decriptare Base64 din URL pentru a gasi numele lung
         if (sub.url && sub.url.includes('/proxy/')) {
           const urlParts = sub.url.split('/');
           const base64Index = urlParts.findIndex(p => p === 'proxy') + 2; 
@@ -123,8 +122,6 @@ app.get("/:config?/subtitles/:type/:id/:extra?.json", async (req, res) => {
         }
         
         let finalTitle = extractedName || sub.title || sub.filename || `Subtitrare ${index + 1}`;
-        
-        // --- LOGICA DE ETICHETE SCURTE (CERUTA DE TINE) ---
         let shortFormat = "Standard";
         let upperTitle = finalTitle.toUpperCase();
         
@@ -144,19 +141,18 @@ app.get("/:config?/subtitles/:type/:id/:extra?.json", async (req, res) => {
             shortFormat = "HDTV";
         }
 
-        console.log(`  🔎 [Subtitrarea ${index + 1}] -> Folder stanga: Română | Nume dreapta: ${shortFormat}`);
+        let formatCuSteag = `🇷🇴 ${shortFormat}`;
+        console.log(`  🔎 [Subtitrarea ${index + 1}] -> Meniu Stanga: ${formatCuSteag}`);
         
-        // Pachetul "Curat" pentru Stremio
         return {
           id: sub.id,
           url: sub.url,
-          lang: "ron", // Asta il tine in folderul default "Română" din stanga!
-          title: shortFormat // Asta va scrie "BluRay", "WEB-DL", etc. in dreapta!
+          lang: formatCuSteag, // Le grupeaza frumos pe stanga, cu steag, fix ca in poza ta!
+          title: formatCuSteag + "\nSubs.ro Subtitles" // Le afiseaza elegant si pe dreapta
         };
       });
     }
     
-    // Distrugem cache-ul ca Stremio sa primeasca noile nume
     res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate"); 
     res.json(response);
   } catch (e) {
@@ -166,12 +162,31 @@ app.get("/:config?/subtitles/:type/:id/:extra?.json", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Addon live on port ${PORT}`);
-  console.log(`[INFO] VOCEA ESTE ACTIVATA - Hack Titluri On.`);
+  const networkInterfaces = os.networkInterfaces();
+  let localIp = '127.0.0.1';
+  
+  for (const interfaceName in networkInterfaces) {
+    // Ignoram placile de retea virtuale (Docker, vEthernet, VPN)
+    if (interfaceName.toLowerCase().includes('veth') || interfaceName.toLowerCase().includes('docker')) continue;
+    
+    for (const iface of networkInterfaces[interfaceName]) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        // Prioritizam adresele standard de router din casa
+        if (iface.address.startsWith('192.168.')) {
+            localIp = iface.address;
+        } else if (localIp === '127.0.0.1') {
+            localIp = iface.address; // Fallback
+        }
+      }
+    }
+  }
 
-  const RESTART_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours
-  setTimeout(() => {
-    console.error("[SYSTEM] Planned 24h restart triggered. Exiting...");
-    process.exit(0);
-  }, RESTART_INTERVAL);
+  console.log(`🚀 Addon live pe portul ${PORT}`);
+  console.log(`[INFO] DESIGN PREMIUM ACTIVAT - Categorii cu steag 🇷🇴 pe stanga.`);
+  console.log(`\n======================================================`);
+  console.log(`🌐 PENTRU TV / TELEFON (Baza linkului tau local):`);
+  console.log(`➡️  http://${localIp}:${PORT}`);
+  console.log(`\n💻 PENTRU PC (Baza linkului tau local):`);
+  console.log(`➡️  http://127.0.0.1:${PORT}`);
+  console.log(`======================================================\n`);
 });
